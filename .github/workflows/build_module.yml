@@ -255,7 +255,6 @@ jobs:
         -sourcepath $MODULENAME/$RT_MODULE_PART/src \
         -xml:withMessages=./spotbugs-reports/spotbugs.xml \
         -html=./spotbugs-reports/spotbugs.html \
-        -quiet \
         -exitcode \
         -auxclasspath $niagara_home/modules \
         -auxclasspath $niagara_home/bin/ext \
