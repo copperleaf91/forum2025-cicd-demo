@@ -290,7 +290,7 @@ jobs:
       niagara_user_home: ${{ vars.NIAGARA_USER_HOME }}
       OWASP_DEPCHECK_VERSION: ${{ vars.OWASP_DEPCHECK_VERSION }}
       NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-      JAVA_TOOL_OPTIONS: -Xms512m -Xmx1024m
+      JAVA_TOOL_OPTIONS: -Xms1024m -Xmx2048m
       
     steps:
     - name: Setup java
