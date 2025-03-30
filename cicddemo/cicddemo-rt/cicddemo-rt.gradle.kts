@@ -50,7 +50,7 @@ dependencies {
   api(":baja")
 
   // Sample uberjar for demonstratting Software Composition Analysis
-  //uberjar("com.github.jsonld-java:jsonld-java:0.13.0")
+  uberjar("com.github.jsonld-java:jsonld-java:0.12.1")
   
   // Test Niagara module dependencies
   moduleTestImplementation(":test-wb")
