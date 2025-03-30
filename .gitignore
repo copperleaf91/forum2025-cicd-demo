@@ -32,3 +32,6 @@ replay_pid*
 
 # ansible
 ansible/.*
+
+# signing profiles
+ansible/signing-profiles

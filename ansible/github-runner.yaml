@@ -1,39 +1,47 @@
 # This set of tasks is used to register a github runner
-# TODO user VAR (admin)
-# TODO group VAR (admin)
 
-- name: Install packages required for github runners
-  apt:
-    state: latest
-    dpkg_options: 'force-confnew,force-confdef'
-    autoclean: yes
-    autoremove: yes
-    update_cache: yes
-    cache_valid_time: 3600
-  vars:
-    packages:
-    - curl
-    - jq
+# - name: Install packages required for github runners
+#   apt:
+#     state: latest
+#     dpkg_options: 'force-confnew,force-confdef'
+#     autoclean: yes
+#     autoremove: yes
+#     update_cache: yes
+#     cache_valid_time: 3600
+#   vars:
+#     packages:
+#     - curl
+#     - jq
 
 - name: create the github group
   group:
-    name: github
+    name: admin
     state: present
 
 - name: create the github user
   user:
-    name: github
-    group: github
+    name: admin
+    group: admin
     shell: /bin/bash
     state: present
 
-- name: Allow 'github' group to have passwordless sudo
-  lineinfile:
-    dest: /etc/sudoers
+# - name: Allow 'admin' group to have passwordless sudo
+#   lineinfile:
+#     dest: /etc/sudoers
+#     state: present
+#     regexp: '^%admin'
+#     line: '%admin ALL=(ALL) NOPASSWD: ALL'
+#     validate: 'visudo -cf %s'
+- name: Allow 'admin' group to have passwordless sudo
+  become_user: root
+  become: true
+  community.general.sudoers:
+    runas: root
     state: present
-    regexp: '^%github'
-    line: '%github ALL=(ALL) NOPASSWD: ALL'
-    validate: 'visudo -cf %s'
+    group: admin
+    name: admin_sudoers
+    nopassword: true
+    commands: ALL
 
 # Fetch the returncode for systemctl status of the runner
 # rc = 0 - running
@@ -46,12 +54,12 @@
 
 - name: install and register the runner if not already existing
   block:
-  - name: create /home/github/actions-runner
+  - name: create /home/admin/actions-runner
     file:
-      path: /home/github/actions-runner
+      path: /home/admin/actions-runner
       state: directory
-      owner: github
-      group: github
+      owner: admin
+      group: admin
       mode: 0755
 
   - name: fetch github version with uri
@@ -66,17 +74,17 @@
   - name: download github actions runner
     get_url:
       url: https://github.com/actions/runner/releases/download/v{{ github_runner_version }}/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
-      owner: github
-      group: github
-      dest: /home/github/actions-runner/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
+      owner: admin
+      group: admin
+      dest: /home/admin/actions-runner/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
       mode: 0755
 
   - name: Unarchive the runner
     unarchive:
-      src: /home/github/actions-runner/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
-      dest: /home/github/actions-runner
-      owner: github
-      group: github
+      src: /home/admin/actions-runner/actions-runner-linux-x64-{{ github_runner_version }}.tar.gz
+      dest: /home/admin/actions-runner
+      owner: admin
+      group: admin
       mode: 0755
       remote_src: yes
 
@@ -130,20 +138,21 @@
       var: github_runner_registration_token
 
   - name: configure the runner  
-    shell: "sudo -E -u github ./config.sh --unattended --url https://github.com/{{ github_runner_organization }} --token {{ github_runner_registration_token }} --name {{ github_runner_name }} --labels {{ ','.join(github_runner_labels) }}"
+    #shell: "sudo -E -u admin ./config.sh --unattended --url https://github.com/{{ github_runner_organization }} --token {{ github_runner_registration_token }} --name {{ github_runner_name }} --labels {{ ','.join(github_runner_labels) }}"
+    shell: "./config.sh --unattended --url https://github.com/{{ github_runner_organization }} --token {{ github_runner_registration_token }} --name {{ github_runner_name }} --labels {{ ','.join(github_runner_labels) }}"
     args:
       executable: /bin/bash
-      chdir: /home/github/actions-runner
+      chdir: /home/admin/actions-runner
 
   - name: install the runner as a service
     shell: "sudo ./svc.sh install"
     args:
       executable: /bin/bash
-      chdir: /home/github/actions-runner
+      chdir: /home/admin/actions-runner
 
   - name: start the runner
-    shell: ./svc.sh start
+    shell: sudo ./svc.sh start
     args:
       executable: /bin/bash
-      chdir: /home/github/actions-runner
+      chdir: /home/admin/actions-runner
   when: _runner_status.rc == 4 and 'could not be found' in _runner_status.stderr
