@@ -53,5 +53,5 @@ public class BCiCdDemo extends BComponent
 //  }
 
   private static final Logger LOG = Logger.getLogger("cicd_demo");
-  private static final String HELLO_WORLD = "Hello, Earth!";
+  private static final String HELLO_WORLD = "Hello, World!";
 }

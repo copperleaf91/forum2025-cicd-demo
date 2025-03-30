@@ -47,11 +47,11 @@ public class BCiCdDemoTest extends BTestNg
     Assert.assertEquals(demo.getFirstWord(), "Hello");
   }
 
-  // public void testGetSecondWord()
-  // {
-  //   BCiCdDemo demo = new BCiCdDemo();
-  //   Assert.assertEquals(demo.getSecondWord(), " World!");
-  // }
+  public void testGetSecondWord()
+  {
+    BCiCdDemo demo = new BCiCdDemo();
+    Assert.assertEquals(demo.getSecondWord(), " World!");
+  }
 
   public void testSayHelloWorld()
   {
